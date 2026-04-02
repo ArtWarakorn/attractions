@@ -1,72 +1,70 @@
-import { NextResponse } from "next/server"
-import { mysqlPool } from "@/utils/db"
+import { NextResponse } from "next/server";
+import { supabase } from "@/utils/supabase";
 
+// GET /api/attractions/:id
 export async function GET(req, { params }) {
-    const { id } = await params
-    const promisePool = mysqlPool.promise()
-    const [row] = await promisePool.query(
-        `SELECT * FROM attractions WHERE id = ?`, [id]
-    )
+  const { id } = await params;
 
-    if (row.length === 0) {
-        return NextResponse.json({ error: "Attraction not found" }, { status: 404 })
-    }
+  const { data, error } = await supabase
+    .from("attractions")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-    return NextResponse.json(row)
+  if (error) {
+    return NextResponse.json({ error: "Attraction not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(data);
 }
 
-// PUT /api/attractions/:id  -> Update
+// PUT /api/attractions/:id
 export async function PUT(request, { params }) {
-    try {
-        const { id } = await params;
-        const body = await request.json();
-        const { name, detail, coverimage, latitude, longitude } = body;
+  try {
+    const { id } = await params;
+    const body = await request.json();
 
-        const promisePool = mysqlPool.promise();
-        const [exists] = await promisePool.query(
-            `SELECT id FROM attractions WHERE id = ?`,
-            [id]
-        );
-        if (exists.length === 0) {
-            return NextResponse.json({ message: "Not found" }, { status: 404 });
-        }
+    const { name, detail, coverimage, latitude, longitude } = body;
 
-        await promisePool.query(
-            `UPDATE attractions
-         SET name = ?, detail = ?, coverimage = ?, latitude = ?, longitude = ?
-       WHERE id = ?`,
-            [name, detail ?? "", coverimage, latitude ?? null, longitude ?? null, id]
-        );
+    const { data, error } = await supabase
+      .from("attractions")
+      .update({
+        name,
+        detail,
+        coverimage,
+        latitude,
+        longitude,
+      })
+      .eq("id", id)
+      .select()
+      .single();
 
-        const [rows] = await promisePool.query(
-            `SELECT * FROM attractions WHERE id = ?`,
-            [id]
-        );
-        return NextResponse.json(rows[0]);
-    } catch (e) {
-        return NextResponse.json({ error: e.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    return NextResponse.json(data);
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
 }
 
-// DELETE /api/attractions/:id  -> Delete
+// DELETE /api/attractions/:id
 export async function DELETE(_request, { params }) {
-    try {
-        const { id } = await params;
-        const promisePool = mysqlPool.promise();
+  try {
+    const { id } = await params;
 
-        const [exists] = await promisePool.query(
-            `SELECT id FROM attractions WHERE id = ?`,
-            [id]
-        );
-        if (exists.length === 0) {
-            return NextResponse.json({ message: "Not found" }, { status: 404 });
-        }
+    const { error } = await supabase
+      .from("attractions")
+      .delete()
+      .eq("id", id);
 
-        await promisePool.query(`DELETE FROM attractions WHERE id = ?`, [id]);
-        return NextResponse.json({ ok: true });
-    } catch (e) {
-        return NextResponse.json({ error: e.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
 }
-
-
