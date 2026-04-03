@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from "react";
-import "./attractions.css";
+import "../../component/attractions.css";
 
 export default function Page() {
   const [attractions, setAttractions] = useState([]);
