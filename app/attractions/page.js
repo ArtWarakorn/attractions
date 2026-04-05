@@ -62,6 +62,13 @@ export default function Page() {
           </div>
         ))}
       </div>
+
+      <button
+        className="btn-new"
+        onClick={() => router.push("/attractions/new")}
+      >
+        + New Attraction
+      </button>
     </div>
   );
 }
