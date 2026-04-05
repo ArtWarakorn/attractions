@@ -1,10 +1,12 @@
 'use client'
 import React, { useState, useEffect } from "react";
-import "../../component/attractions.css";
+import "@/component/attractions.css";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [attractions, setAttractions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAttractions = async () => {
@@ -25,8 +27,12 @@ export default function Page() {
     );
   }
 
+  const onhandle = (id) => {
+    router.push(`/attractions/${id}`);
+  }
+
   return (
-    <div className="page">
+    <div className="page-list">
       <h1 className="title">🌍 Attractions</h1>
 
       <div className="grid">
@@ -47,7 +53,11 @@ export default function Page() {
             <div className="content">
               <h2>{attraction.name}</h2>
               <p>{attraction.detail}</p>
-              <button className="btn">View More</button>
+              <button
+                className="btn"
+                onClick={() => onhandle(attraction.id)}
+              >View More
+              </button>
             </div>
           </div>
         ))}

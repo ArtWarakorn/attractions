@@ -5,7 +5,7 @@
   font-family: "Poppins", sans-serif;
 }
 
-.page {
+.page-list {
   min-height: 100vh;
   padding: 60px 80px;
   background: linear-gradient(135deg, #0f172a, #1e293b, #111827);
