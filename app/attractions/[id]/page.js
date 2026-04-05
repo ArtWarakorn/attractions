@@ -1,64 +1,65 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import "@/component/attraction.css";
+import { useParams, useRouter } from "next/navigation";
+import "@/component/attractions.css";
 
 export default function Page() {
-    const { id } = useParams();
-    const router = useRouter();
-    const [attraction, setAttraction] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  const router = useRouter();
 
-    useEffect(() => {
-        if (!id) return;
+  const [attraction, setAttraction] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-        const fetchAttraction = async () => {
-            const response = await fetch(`/api/attractions/${id}`);
-            const data = await response.json();
-            setAttraction(data);
-            setLoading(false);
-        };
+  useEffect(() => {
+    if (!id) return;
 
-        fetchAttraction();
-    }, [id]);
+    const fetchAttraction = async () => {
+      const response = await fetch(`/api/attractions/${id}`);
+      const data = await response.json();
+      setAttraction(data);
+      setLoading(false);
+    };
 
-    const onback = () => {
-        router.push("/attractions");
-    }
+    fetchAttraction();
+  }, [id]);
 
-    if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="spinner"></div>
-                <h2>Loading Attractions...</h2>
-            </div>
-        );
-    }
-    if (!attraction) return <h2>Not Found</h2>;
+  const onback = () => {
+    router.push("/attractions");
+  };
 
+  if (loading) {
     return (
-        <div className="page-detail">
-            <div className="detail-container">
-                <div className="card-detail">
-                    <div className="detail-img-box">
-                        <img
-                            src={attraction.coverimage}
-                            alt={attraction.name}
-                            className="detail-img"
-                        />
-                    </div>
-
-                    <div className="detail-content">
-                        <h2 className="detail-title">{attraction.name}</h2>
-                        <p className="detail-text">{attraction.detail}</p>
-
-                        <button className="back-btn" onClick={onback}>
-                            ⬅ Back
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div className="detail-loading-container">
+        <div className="detail-spinner"></div>
+        <h2>Loading Attractions...</h2>
+      </div>
     );
+  }
+
+  if (!attraction) return <h2>Not Found</h2>;
+
+  return (
+    <div className="detail-page">
+      <div className="detail-wrapper">
+        <div className="detail-card">
+          <div className="detail-image-box">
+            <img
+              src={attraction.coverimage}
+              alt={attraction.name}
+              className="detail-image"
+            />
+          </div>
+
+          <div className="detail-body">
+            <h2 className="detail-heading">{attraction.name}</h2>
+            <p className="detail-description">{attraction.detail}</p>
+
+            <button className="detail-back-btn" onClick={onback}>
+              ⬅ Back
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
